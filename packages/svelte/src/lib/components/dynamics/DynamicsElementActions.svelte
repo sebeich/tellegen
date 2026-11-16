@@ -49,7 +49,15 @@
 	let loadPct = $state(10);
 	let message = $state<string | null>(null);
 
+	/** The live view runs on this case: an action applies at once. */
+	const live = $derived(dyn.live.active && dyn.live.localId === app.activeLocal?.id);
+
 	function add(e: DynEvent) {
+		if (live) {
+			dyn.live.now(e);
+			message = `Applied live at t = ${dyn.live.t.toFixed(2)} s: ${dyn.describe(e).split(' at ')[0]}`;
+			return;
+		}
 		message = dyn.add(e) ?? `Added: ${dyn.describe(e)}`;
 	}
 </script>
@@ -64,11 +72,12 @@
 		<p class="dim">{att.status === 'opening' ? 'Opening the dynamic data…' : att.error}</p>
 	{:else if bus !== null}
 		<h4>Bus {bus}{busName ? ` ${busName}` : ''}</h4>
+		{#if live}<p class="live" data-testid="dyn-live-hint">Live: an action applies now.</p>{/if}
 		{#if !hasBus}
 			<p class="dim">The simulated network has no bus {bus}.</p>
 		{:else}
 			<button class="action" onclick={() => add(busFault(bus, f0))}
-				>⚡ Apply a fault here <span class="hint">1.000 s, cleared after 6 cycles</span></button
+				>⚡ Apply a fault here <span class="hint">{live ? 'now' : '1.000 s'}, cleared after 6 cycles</span></button
 			>
 			{#if hasLoad}
 				<div class="row">
@@ -120,6 +129,7 @@
 		{/if}
 	{:else if branch}
 		<h4>Branch {branch.from}–{branch.to}</h4>
+		{#if live}<p class="live">Live: an action applies now.</p>{/if}
 		{#if circuits.length === 0}
 			<p class="dim">The simulated network has no in-service branch {branch.from}–{branch.to}.</p>
 		{:else}
@@ -177,6 +187,11 @@
 </section>
 
 <style>
+	.live {
+		margin: 0;
+		color: var(--text-accent);
+		font-weight: 600;
+	}
 	.dyn-actions {
 		display: grid;
 		gap: 8px;

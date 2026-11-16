@@ -404,15 +404,15 @@ describe('experimental preference', () => {
 			getItem: (k: string) => stored[k] ?? null,
 			setItem: (k: string, v: string) => (stored[k] = v)
 		} as unknown as Storage);
-		expect(p.experimental).toBe(false);
+		expect(p.experimental).toBe(true);
 		expect(() => p.update({ experimental: 'yes' })).toThrow('Invalid display');
-		p.update({ experimental: true });
+		p.update({ experimental: false });
 		const q = new UserPreferences();
 		q.initialize({
 			getItem: (k: string) => stored[k] ?? null,
 			setItem: () => {}
 		} as unknown as Storage);
-		expect(q.experimental).toBe(true);
+		expect(q.experimental).toBe(false);
 	});
 });
 

@@ -18,6 +18,8 @@
 	import TellegenMap from './TellegenMap.svelte';
 	import DynamicsPanel from './components/dynamics/DynamicsPanel.svelte';
 	import DynamicsTimeline from './components/dynamics/DynamicsTimeline.svelte';
+	import DynamicsUnitPopup from './components/dynamics/DynamicsUnitPopup.svelte';
+	import DynamicsWorkbench from './components/dynamics/DynamicsWorkbench.svelte';
 	import DynamicsLegend from './components/dynamics/DynamicsLegend.svelte';
 
 	const app = getAppState();
@@ -30,8 +32,13 @@
 	const MAP_CONTROL_ROW = 64;
 	const dyn = ctrl.dynamics;
 	let timelineHeight = $state(0);
+	/** The live workbench replaces the playback dock while it is open. */
+	const workbenchShown = $derived(app.mode === 'dynamics' && dyn.live.open && !!dyn.active);
 	const dynamicsShown = $derived(
-		app.mode === 'dynamics' && !!dyn.current?.run && dyn.current.localId === app.activeLocal?.id
+		workbenchShown ||
+			(app.mode === 'dynamics' &&
+				!!dyn.current?.run &&
+				dyn.current.localId === app.activeLocal?.id)
 	);
 	// The legend explains the map's dynamics layers: during playback, and at
 	// rest before the first run. The single-line diagram draws neither.
@@ -179,9 +186,12 @@
 	<ControlPanel />
 	{#if app.mode !== 'dynamics'}<SolveCard />{/if}
 	{#if !app.studyView}<DynamicsPanel />{/if}
-	{#if dynamicsShown}
+	{#if workbenchShown}
+		<DynamicsWorkbench bind:dockHeight={timelineHeight} />
+	{:else if dynamicsShown}
 		<DynamicsTimeline bind:dockHeight={timelineHeight} />
 	{/if}
+	{#if app.mode === 'dynamics'}<DynamicsUnitPopup />{/if}
 	{#if legendShown}<DynamicsLegend
 			theme={config.theme}
 			top={app.headerInset + 52}

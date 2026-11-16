@@ -39,6 +39,8 @@ mod dist;
 mod geo;
 #[cfg(feature = "rms")]
 pub mod rms;
+#[cfg(feature = "rms-experimental")]
+mod rms_tools;
 #[cfg(feature = "synth")]
 mod synth;
 

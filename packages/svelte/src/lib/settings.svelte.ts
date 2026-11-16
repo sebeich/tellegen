@@ -18,9 +18,10 @@ export class UserPreferences {
 	coloring = $state<'price' | 'angle' | 'voltage' | 'demand'>('price');
 	/** Zen mode hides the panels; it survives a reload so a presenter keeps the view. */
 	zen = $state(false);
-	/** Show the experimental dynamics tools (small-signal modes, default
-	 * dynamics). Off by default; their results carry an Experimental label. */
-	experimental = $state(false);
+	/** Show the experimental dynamics tools (live view, unit editor and
+	 * block diagrams, small-signal modes and frequency responses, default
+	 * dynamics). On by default; their results carry an Experimental label. */
+	experimental = $state(true);
 	error = $state<string | null>(null);
 	revision = $state(0);
 	#storage: Storage | undefined;
@@ -83,7 +84,7 @@ export class UserPreferences {
 			busSizing: 'power',
 			coloring: 'price',
 			zen: false,
-			experimental: false
+			experimental: true
 		});
 	}
 }
