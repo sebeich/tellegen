@@ -90,7 +90,7 @@
 	bind:open
 	onopen={() => (app.mode = 'dynamics')}
 >
-	<div class="dyn" data-testid="dynamics-panel">
+	<div class="dyn dyn-form" data-testid="dynamics-panel">
 		{#if hosted}
 			<p>
 				Dynamics needs PSS/E dynamic data (.dyr). Open the WECC 240 demo, or drop a .raw with its

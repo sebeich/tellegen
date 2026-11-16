@@ -5,6 +5,12 @@
 	import { GRAPH_PORTS, type BlockGraph } from '@tellegen/engine';
 	import GraphCanvas from './GraphCanvas.svelte';
 
+	/** Mount the dialog on the page body, above the panel dock and toolbar. */
+	function toBody(node: HTMLElement) {
+		document.body.appendChild(node);
+		return { destroy: () => node.remove() };
+	}
+
 	let {
 		graph: initial,
 		title,
@@ -46,7 +52,7 @@
 
 <svelte:window onkeydown={(e) => e.key === 'Escape' && onclose()} />
 
-<div class="editor" role="dialog" aria-label={title}>
+<div class="editor dyn-form" role="dialog" aria-label={title} use:toBody>
 	<header>
 		<h3>{title}</h3>
 		<input class="name mono" bind:value={g.name} aria-label="graph name" />
@@ -76,7 +82,7 @@
 		right: 24px;
 		top: 64px;
 		bottom: 24px;
-		z-index: 45;
+		z-index: 60;
 		display: flex;
 		flex-direction: column;
 		background: var(--surface-menu);
