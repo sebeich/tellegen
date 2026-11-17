@@ -87,7 +87,7 @@ import {
 } from '@tellegen/engine';
 import { browserSolveFailure, errorText, extent, formulationLabel, rgbaCss } from './format.js';
 import { DEAD_ZONE_MW } from './slider.js';
-import { DEMO_LABEL, DynamicsController } from './dynamics/controller.svelte.js';
+import { DynamicsController } from './dynamics/controller.svelte.js';
 
 function sameSettings(a: unknown, b: unknown): boolean {
 	if (a && b && typeof a === 'object' && typeof b === 'object') {
@@ -2969,14 +2969,14 @@ export class Controller {
 					continue;
 				}
 				const id = `local-${++this.localSeq}`;
-				// The bundled demo's RAW header is a sentence cut off at its
-				// field width, not a name.
-				const label =
-					this.dynamics.attachingDemo && format === 'raw'
-						? DEMO_LABEL
-						: summary.name && summary.name !== 'case'
-							? summary.name
-							: file.name.replace(/\.[^.]+$/, '');
+				// The bundled demo and library models are named by their
+				// catalog, not by the file header (a RAW header is often a
+				// sentence cut off at its field width).
+				const label = this.dynamics.exampleLabel
+					? this.dynamics.exampleLabel
+					: summary.name && summary.name !== 'case'
+						? summary.name
+						: file.name.replace(/\.[^.]+$/, '');
 				this.logImport(file.name, summary, module_json);
 				const local = new LocalCase({
 					id,

@@ -10,7 +10,14 @@
 	const config = getUiConfig();
 	onMount(() => {
 		void ctrl.probeCollections();
+		void ctrl.dynamics.loadExamples();
 	});
+	const library = $derived(ctrl.dynamics.examples);
+	/** The command palette, filtered to the hosted model library. */
+	function openLibrary() {
+		commands.show();
+		commands.query = 'library';
+	}
 
 	let fileInput = $state.raw<HTMLInputElement | undefined>(undefined);
 	function openFolder() {
@@ -42,6 +49,25 @@
 				group: 'Cases',
 				run: () => void ctrl.dynamics.openDemo().catch((e) => (app.error = (e as Error).message))
 			},
+			...(ctrl.dynamics.examples?.cases ?? []).map((c): Command => {
+				const lib = ctrl.dynamics.examples?.libraries.find((l) => l.id === c.library);
+				return {
+					id: `library:${c.id}`,
+					title: `Open ${ctrl.dynamics.exampleName(c)}`,
+					hint: [lib?.title, c.info, c.dynamics ? 'Dynamics' : 'Steady state']
+						.filter(Boolean)
+						.join(' · '),
+					keywords: [
+						'library',
+						'model',
+						c.dynamics ? 'dynamics' : 'steady',
+						...`${lib?.title ?? ''} ${c.tag ?? ''} ${c.info ?? ''}`.split(/\s+/).filter(Boolean)
+					],
+					group: 'Cases',
+					run: () =>
+						void ctrl.dynamics.openExample(c.id).catch((e) => (app.error = (e as Error).message))
+				};
+			}),
 			...(ctrl.dynamics.active?.status === 'ready'
 				? [
 						{
@@ -218,6 +244,13 @@
 				>{ctrl.collectionsAvailable ? 'Case, ZIP or geo files' : 'Case or geo files'}</span
 			>
 		</button>
+		{#if library && library.cases.length > 0}
+			<button class="ghost filedrop-ui" onclick={openLibrary} data-testid="library-open">
+				<span class="cname">{library.title}</span><span class="cregion"
+					>{library.cases.length} hosted model{library.cases.length === 1 ? '' : 's'}</span
+				>
+			</button>
+		{/if}
 		{#if ctrl.collectionsAvailable}
 			<button class="ghost filedrop-ui" onclick={openFolder}>
 				<span class="cname">Open folder</span><span class="cregion">Shared case files</span>
