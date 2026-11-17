@@ -21,8 +21,7 @@ fn find_branch(sys: &DynSystem, from: usize, to: usize, circuit: &str) -> Result
 
 /// Apply `event` to the system (and, for a generator trip, freeze the
 /// unit's states from `x`); returns the line for the event log.
-///
-/// @block Apply one event
+// @block Apply one event
 pub(super) fn apply_event(
     sys: &mut DynSystem,
     x: &mut [f64],
@@ -210,8 +209,7 @@ pub(super) fn apply_event(
 
 /// The admittance of a fault through `r + jx`; a fault needs a finite,
 /// nonzero impedance.
-///
-/// @block Fault admittance
+// @block Fault admittance
 fn fault_admittance(r: f64, x: f64) -> Result<C64, String> {
     let z = C64::new(r, x);
     if r < 0.0 || x < 0.0 {

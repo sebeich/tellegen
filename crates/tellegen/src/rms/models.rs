@@ -159,8 +159,7 @@ pub(crate) struct SalientPole {
 /// The machine models: classical, round rotor (`GENROU`, `GENROE`) and
 /// salient pole (`GENSAL`, `GENSAE`), with their stator algebra and
 /// rotor flux dynamics.
-///
-/// @block Machines
+// @block Machines
 #[derive(Clone, Debug)]
 pub(crate) enum Machine {
     /// `GENCLS`: constant `e'q` behind `R + j X'd`, no states.
@@ -368,8 +367,7 @@ impl SalientPole {
 }
 
 /// Single-mass shaft: states `[δ, ω]`.
-///
-/// @block Shaft
+// @block Shaft
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct Shaft {
     pub h: f64,
@@ -387,8 +385,7 @@ impl Shaft {
 }
 
 /// Exciters. `Fixed` holds `Vf = V_ref`.
-///
-/// @block Exciters
+// @block Exciters
 #[derive(Clone, Debug)]
 pub(crate) enum Avr {
     Fixed,
@@ -835,8 +832,7 @@ pub(crate) fn breach(
 }
 
 /// Turbine-governors. `Fixed` holds `τm = P_ref`.
-///
-/// @block Governors
+// @block Governors
 #[derive(Clone, Debug)]
 pub(crate) enum Governor {
     Fixed,
@@ -1073,8 +1069,7 @@ impl Governor {
 }
 
 /// Stabilizers.
-///
-/// @block Stabilizers
+// @block Stabilizers
 #[derive(Clone, Debug)]
 pub(crate) enum Stabilizer {
     None,

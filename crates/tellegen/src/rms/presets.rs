@@ -28,8 +28,7 @@ pub struct PresetModel {
 }
 
 /// A generating unit from published data.
-///
-/// @block Unit preset
+// @block Unit preset
 #[derive(Clone, Copy, Debug, PartialEq, Serialize)]
 pub struct UnitPreset {
     pub id: &'static str,

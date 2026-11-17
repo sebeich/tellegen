@@ -602,8 +602,7 @@ impl RmsSimulation {
 
     /// A run from the start, or from a checkpoint of an earlier run of the
     /// same request; `cancelled` is polled at every output sample.
-    ///
-    /// @block The run loop
+    // @block The run loop
     fn run_from(
         &self,
         request: &RmsRequest,

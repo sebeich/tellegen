@@ -22,8 +22,7 @@ use crate::model::AcNetwork;
 pub(crate) type C64 = Complex<f64>;
 
 /// One synchronous generator with its controls.
-///
-/// @block Generating unit
+// @block Generating unit
 #[derive(Clone, Debug)]
 pub(crate) struct GenDevice {
     pub bus_number: usize,
@@ -216,8 +215,7 @@ impl GenDevice {
 
 /// A Thevenin source `E` behind `Z`, as a Norton equivalent: `y` enters the
 /// admittance matrix and `y E` is a constant injection.
-///
-/// @block Thevenin source
+// @block Thevenin source
 #[derive(Clone, Debug)]
 pub(crate) struct Source {
     pub bus_number: usize,
@@ -241,8 +239,7 @@ pub(crate) struct Source {
 /// current (`γ = 1`), constant power (`γ = 0`) and the other exponents are
 /// the nonlinear current `I = (P − jQ) V / |V|²` ([`Self::nonlinear_current`]),
 /// with their low-voltage behaviour set by [`LowVoltage`].
-///
-/// @block Static load
+// @block Static load
 #[derive(Clone, Debug, Default)]
 pub(crate) struct BusLoad {
     pub v0: f64,
@@ -503,8 +500,7 @@ fn soft_vm(vm: f64, v0: f64) -> f64 {
 
 /// A unit without a simulated model (an inverter chain), held as a
 /// constant-current injection `conj(s) V/|V| / v0` inside its bus's load.
-///
-/// @block Held unit
+// @block Held unit
 #[derive(Clone, Debug)]
 pub(crate) struct HeldUnit {
     pub bus_number: usize,
@@ -557,8 +553,7 @@ impl HeldUnit {
 }
 
 /// The assembled RMS system.
-///
-/// @block The system
+// @block The system
 #[derive(Clone, Debug)]
 pub(crate) struct DynSystem {
     pub n: usize,
@@ -722,8 +717,7 @@ impl DynSystem {
     }
 
     /// `f(x)`, and the device outputs when `outs` is given.
-    ///
-    /// @block Residual f(x)
+    // @block Residual f(x)
     pub(crate) fn residual(&self, x: &[f64], f: &mut [f64], mut outs: Option<&mut Vec<GenOut>>) {
         let n = self.n;
         f.iter_mut().for_each(|v| *v = 0.0);

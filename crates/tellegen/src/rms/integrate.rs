@@ -84,8 +84,7 @@ impl Patterns {
 }
 
 /// A sparse LU of a square matrix.
-///
-/// @block Sparse LU
+// @block Sparse LU
 pub(super) struct SparseLu {
     pattern: Arc<Pattern>,
     numeric: NumericLu<usize, f64>,
@@ -156,8 +155,7 @@ enum Lu {
 /// A Jacobian factorization kept across steps (the "very dishonest Newton" of
 /// production transient-stability programs): reused while the step size, the
 /// method and the system epoch are unchanged, refreshed when Newton stalls.
-///
-/// @block Step matrix factorization
+// @block Step matrix factorization
 struct Factor {
     lu: Lu,
     /// The step the matrix was built with.
@@ -337,8 +335,7 @@ impl History {
 
 /// The integrator of one run: the factorization it reuses, the last points
 /// and its buffers.
-///
-/// @block The stepper's state
+// @block The stepper's state
 #[derive(Default)]
 pub(crate) struct Stepper {
     factor: Option<Factor>,
@@ -422,8 +419,7 @@ impl Stepper {
     /// Advance `(x, f)` by one step `h` with weight `theta` (`0.5`
     /// trapezoidal, `1.0` backward Euler). Returns the Newton iterations; on
     /// an error `x` and `f` are unchanged.
-    ///
-    /// @block One step
+    // @block One step
     pub(crate) fn step(
         &mut self,
         sys: &DynSystem,
@@ -445,8 +441,7 @@ impl Stepper {
     /// differential states (a filterless IEEEST, for instance), that system
     /// is singular; the fallback then holds every device state and re-solves
     /// the network voltages. On an error `x` and `f` are unchanged.
-    ///
-    /// @block Re-solve after an event
+    // @block Re-solve after an event
     pub(crate) fn reinit(
         &mut self,
         sys: &DynSystem,
@@ -475,8 +470,7 @@ impl Stepper {
     /// Otherwise (at the start and for two steps after an event): the
     /// differential states move by `h ẋ_n` (with `ẋ_n = f_n / M`); algebraic
     /// states start at their last value.
-    ///
-    /// @block Predictor
+    // @block Predictor
     fn predict(
         history: &History,
         epoch: u64,
@@ -512,8 +506,7 @@ impl Stepper {
     /// Solve one step from `(xn, fn_)` into `work.x`, `work.f` (`h = 0`
     /// re-solves the algebraic variables only). `cached` uses and keeps the
     /// factorization.
-    ///
-    /// @block Newton solve of one step
+    // @block Newton solve of one step
     #[allow(clippy::too_many_arguments)]
     fn solve(
         &mut self,
@@ -706,8 +699,7 @@ impl Stepper {
 /// residual at rounding level cannot be lowered), with that residual.
 /// `None` when no step length does: a step that raises the residual is never
 /// taken.
-///
-/// @block Backtracking
+// @block Backtracking
 fn backtrack(rnorm: f64, mut trial: impl FnMut(f64) -> f64) -> Option<(f64, f64)> {
     let mut alpha = 1.0;
     while alpha >= 1.0 / 64.0 {
@@ -721,8 +713,7 @@ fn backtrack(rnorm: f64, mut trial: impl FnMut(f64) -> f64) -> Option<(f64, f64)
 }
 
 /// The equations of one step from `(xn, fn_)`.
-///
-/// @block Step equations
+// @block Step equations
 struct Step<'a> {
     sys: &'a DynSystem,
     mass: &'a [f64],
@@ -778,8 +769,7 @@ fn largest_residual(sys: &DynSystem, r: &[f64]) -> String {
 /// L-stable backward-Euler step (which damps the chatter of limiters and
 /// rectifiers that switch inside the step), then halve the step. On an error
 /// `x` and `f` are unchanged.
-///
-/// @block Step with fallbacks
+// @block Step with fallbacks
 pub(super) fn step_adaptive(
     sys: &DynSystem,
     x: &mut Vec<f64>,

@@ -5,9 +5,10 @@
 //!
 //! - a **module** block by `@block <title>` in the `//!` docs of a file; it
 //!   holds the whole file;
-//! - an **item** block by `@block <title>` in the `///` docs of a `fn`,
-//!   `struct`, `enum`, `trait`, `impl`, `type`, `const`, `static` or `mod`; it
-//!   holds that item;
+//! - an **item** block by a `// @block <title>` line right under the `///`
+//!   docs of a `fn`, `struct`, `enum`, `trait`, `impl`, `type`, `const`,
+//!   `static` or `mod` (so rustdoc and JSON schemas never show the tag; a
+//!   `@block` line inside the `///` docs works too); it holds that item;
 //! - a **section** block by an own-line `// @block <title>` comment, followed
 //!   by `//` lines that document it; it holds the code from there to the next
 //!   section marker at the same brace depth, a `// @end` line, or the brace
@@ -450,9 +451,18 @@ impl FileScan {
         }];
 
         // Item and section blocks.
+        // A `// @block` line right under an item's `///` docs tags that item;
+        // its docs are the item's (rustdoc and schemas never see the tag).
+        let docs_above = |g: &Group| {
+            groups
+                .iter()
+                .position(|o| o.kind == CommentKind::Outer && o.line + o.lines.len() == g.line)
+        };
+        let tags_item = |g: &Group| docs_above(g).is_some();
         let markers: Vec<(usize, usize, bool)> = groups
             .iter()
             .filter(|g| g.kind == CommentKind::Plain && !self.in_test(g.start))
+            .filter(|g| !tags_item(g))
             .filter_map(|g| {
                 let first = g.lines.first()?.trim();
                 let is_block = first == "@block" || first.starts_with("@block ");
@@ -504,20 +514,22 @@ impl FileScan {
                         ));
                         continue;
                     }
-                    // A section between an item's docs and the item would
-                    // split them (rustdoc and clippy see an empty line).
-                    if self
-                        .lexed
-                        .comments
-                        .iter()
-                        .any(|c| c.kind == CommentKind::Outer && c.line + 1 == g.line)
-                    {
-                        issues.push(issue(
-                            &path,
-                            g.line,
-                            "a section `// @block` splits a `///` doc comment; put it above the docs"
-                                .into(),
-                        ));
+                    if let Some(o) = docs_above(g) {
+                        let docs = &groups[o];
+                        let (mut lines, _) = split_tags(&docs.lines, true);
+                        lines.extend(g.lines[1..].iter().cloned());
+                        let span = Group {
+                            kind: CommentKind::Plain,
+                            start: docs.start,
+                            end: g.end,
+                            line: docs.line,
+                            lines: Vec::new(),
+                        };
+                        match self.item_block(&span, &lines, title, doc) {
+                            Ok(b) => found.push(b),
+                            Err(m) => issues.push(issue(&path, g.line, m)),
+                        }
+                        continue;
                     }
                     let depth = self.depth_at(g.start);
                     let close = self.closing_brace(g.start, depth);
@@ -1330,7 +1342,7 @@ pub struct Holder { x: f64 }
 
 impl Holder {
     /// Runs it.
-    /// @block Run
+    // @block Run
     pub fn run(&self) -> f64 {
         // @block Prepare
         // Get ready.
@@ -1383,6 +1395,9 @@ mod tests {
         );
         let finish = d.find("r::a::Holder::run#finish").unwrap();
         assert_eq!(finish.doc, "Done.");
+        // The plain form under the docs: the docs are the item's, tag-free.
+        assert_eq!(d.find("r::a::Holder::run").unwrap().doc, "Runs it.");
+        assert_eq!(d.find("r::a::Holder").unwrap().doc, "Holds things.");
         assert_eq!((finish.start_line, finish.end_line), (15, 17));
         assert_eq!(
             d.find("r::a::Holder").unwrap().signature.as_deref(),

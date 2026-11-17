@@ -25,8 +25,7 @@ use super::{apply_event, topology, unit_key, RmsEvent, RmsRequest, RmsResult, Rm
 
 /// The screening criteria. Every field has a default (`version` 1); a
 /// request may override any of them.
-///
-/// @block Screening criteria
+// @block Screening criteria
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
@@ -264,8 +263,7 @@ pub struct IslandScreen {
 }
 
 /// The screening of a run.
-///
-/// @block Screening result
+// @block Screening result
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct RmsScreening {
@@ -493,8 +491,7 @@ impl RmsSimulation {
     /// When the run does not record the channels a screening needs
     /// (`omega:`, `delta:`, `vm:`, `va:`), naming the missing ones, or an
     /// event names an element the system lacks.
-    ///
-    /// @block Screen a run
+    // @block Screen a run
     pub fn screen(
         &self,
         request: &RmsRequest,
@@ -537,8 +534,7 @@ impl RmsSimulation {
     /// Everything the screening says, from the run's own samples: the islands
     /// between events, each island's centre of inertia, the frequency, angle
     /// and voltage figures, and the verdict with its reasons.
-    ///
-    /// @block Analyse a run
+    // @block Analyse a run
     #[allow(clippy::too_many_lines)]
     fn analyse(
         &self,

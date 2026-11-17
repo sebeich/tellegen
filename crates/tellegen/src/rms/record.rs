@@ -57,8 +57,7 @@ struct Group {
 
 /// The recorder of a run or a live session: the catalog of every channel,
 /// the selected groups and their samples.
-///
-/// @block The recorder
+// @block The recorder
 pub(super) struct Recorder {
     /// Further channels recorded at every output sample (aligned with the
     /// main group).
@@ -138,8 +137,7 @@ impl Recorder {
     }
 
     /// The catalog of every channel and the groups' selections.
-    ///
-    /// @block Channel catalog
+    // @block Channel catalog
     pub(super) fn build_catalog(&mut self, sys: &DynSystem, x: &[f64]) {
         let n = sys.n;
         let mut cat: Vec<(String, Source)> = Vec::new();
@@ -364,8 +362,7 @@ impl Recorder {
     }
 
     /// Append the values of `sel` at state `x` to `out`.
-    ///
-    /// @block Evaluate channels
+    // @block Evaluate channels
     pub(super) fn eval(
         &mut self,
         sys: &DynSystem,
@@ -465,8 +462,7 @@ impl Recorder {
 
     /// Record the channels due at time `t`: the main group at every output
     /// sample, the map frames at their own step.
-    ///
-    /// @block Take a sample
+    // @block Take a sample
     pub(super) fn record(&mut self, sys: &DynSystem, t: f64, x: &[f64]) {
         if self.catalog.is_empty() {
             self.build_catalog(sys, x);

@@ -23,8 +23,7 @@ nested by where they are:
 //! @block Time integration                 <- a module: the whole file
 
 /// Advance `(x, f)` by one step `h` …
-///
-/// @block One step                         <- an item: this fn, struct, enum,
+// @block One step                          <- an item: this fn, struct, enum,
 pub(crate) fn step(…) {                     //    trait, impl, type, const, mod
     // @block Predict                       <- a section of code, up to the
     // Newton starts from the parabola …    //    next section at this depth,
@@ -37,15 +36,16 @@ pub(crate) fn step(…) {                     //    trait, impl, type, const, mo
 
 - **Module:** `@block <title>` in the file's `//!` docs. The documentation is
   the module docs.
-- **Item:** `@block <title>` in an item's `///` docs. The documentation is the
-  item's docs (rustdoc shows the tag as a last line).
+- **Item:** a `// @block <title>` line right under an item's `///` docs. The
+  documentation is the item's docs. The tag is an ordinary comment, so
+  rustdoc and the JSON schemas derived from doc comments never show it.
 - **Section:** an own-line `// @block <title>` comment, followed by the `//`
   lines that document it. A section can group anything: statements in a
   function, methods in an `impl`, items or `mod` declarations in a module
   (`rms/mod.rs` groups its modules into stages this way). `// @end` ends one
   early.
 
-Tags close a doc comment, like JSDoc's. The first paragraph is the summary the
+A module tag closes its doc comment, like a JSDoc tag. The first paragraph is the summary the
 diagram shows in a box; the rest appears beside it.
 
 ## What comes from the code

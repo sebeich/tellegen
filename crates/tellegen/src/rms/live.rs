@@ -43,8 +43,7 @@ fn pack_series(channels: &mut BTreeMap<String, Vec<f64>>) -> (Vec<String>, Vec<u
 
 /// Pack a result or chunk as JSON metadata plus flat `f64` buffers, so the
 /// browser reads the samples without parsing them.
-///
-/// @block Flat buffers
+// @block Flat buffers
 fn pack<T: Serialize>(
     mut value: T,
     channels: impl FnOnce(
@@ -113,8 +112,7 @@ fn pack<T: Serialize>(
 ///
 /// # Errors
 /// When the result does not serialize.
-///
-/// @block Pack results as buffers
+// @block Pack results as buffers
 pub fn pack_result(result: RmsResult) -> Result<RmsBuffers, String> {
     pack(result, |r| {
         let cps = std::mem::take(&mut r.checkpoints);
@@ -240,8 +238,7 @@ pub struct RmsChunk {
 
 /// A running simulation that advances on demand and takes events at its
 /// current time: the engine of the live view.
-///
-/// @block Live session
+// @block Live session
 pub struct RmsLive {
     sys: DynSystem,
     x: Vec<f64>,
@@ -266,8 +263,7 @@ pub struct RmsLive {
 
 impl RmsSimulation {
     /// Start a live session at the initial operating point.
-    ///
-    /// @block Start a live session
+    // @block Start a live session
     #[must_use]
     pub fn live(&self, dt: f64, output_step: f64) -> RmsLive {
         let mut f = vec![0.0; self.sys.nx];
@@ -359,8 +355,7 @@ impl RmsLive {
     /// # Errors
     /// When the event names a missing element or the network cannot be
     /// re-solved.
-    ///
-    /// @block Take an event while running
+    // @block Take an event while running
     pub fn apply(&mut self, mut event: RmsEvent) -> Result<String, String> {
         let now = self.t;
         match &mut event {
@@ -412,8 +407,7 @@ impl RmsLive {
     /// # Errors
     /// When the unit is in service or does not exist, or the network cannot
     /// be re-solved.
-    ///
-    /// @block Synchronize a unit
+    // @block Synchronize a unit
     pub fn synchronize_unit(
         &mut self,
         unit: usize,
@@ -757,8 +751,7 @@ impl RmsLive {
     ///
     /// # Errors
     /// When the integration fails; the session stays at the last good point.
-    ///
-    /// @block Advance
+    // @block Advance
     pub fn advance(&mut self, duration: f64) -> Result<RmsChunk, String> {
         self.integrate(duration)?;
         let (time, channels, frames) = self.rec.take();
@@ -814,8 +807,7 @@ impl RmsLive {
     }
 
     /// Integrate `duration` seconds, recording on the way.
-    ///
-    /// @block Integrate a stretch
+    // @block Integrate a stretch
     fn integrate(&mut self, duration: f64) -> Result<(), String> {
         let end = self.t + duration.max(0.0);
         let mut euler = 0usize;

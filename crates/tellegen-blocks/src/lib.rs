@@ -9,7 +9,7 @@
 //! //! @block Time integration
 //!
 //! /// Take one step from `x` …                                                  (item docs)
-//! /// @block One step
+//! // @block One step
 //! pub fn step(…) {
 //!     // @block Predict                                                          (a section)
 //!     // Start Newton from the extrapolated history …

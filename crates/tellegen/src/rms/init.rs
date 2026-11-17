@@ -39,8 +39,7 @@ pub(crate) struct InitReport {
 }
 
 /// Build the system and its initial state.
-///
-/// @block Build the system from a case
+// @block Build the system from a case
 pub(crate) fn build(
     network: &BalancedNetwork,
     dynamics: &DynamicCase,
@@ -701,8 +700,7 @@ pub(crate) fn build(
 /// constant power) and notes naming every generator bus whose solution and
 /// setpoint disagree: a bus released at a reactive limit (its voltage off the
 /// setpoint), or, without limits, a bus whose reactive generation exceeds them.
-///
-/// @block Operating point (AC power flow)
+// @block Operating point (AC power flow)
 pub(crate) fn power_flow(
     network: &BalancedNetwork,
     reactive_limits: bool,
@@ -856,8 +854,7 @@ fn inf_norm(r: &[f64]) -> f64 {
 }
 
 /// Dense Newton with a forward-difference Jacobian on a small square system.
-///
-/// @block Small Newton solver
+// @block Small Newton solver
 pub(crate) fn newton(
     mut u: Vec<f64>,
     mut g: impl FnMut(&[f64], &mut [f64]),
@@ -933,8 +930,7 @@ pub(crate) fn newton(
 /// steady states are solved with their limits removed and then checked
 /// against them: one that leaves no steady state fails naming the limit and
 /// the value the dispatch needs.
-///
-/// @block Initialize one unit
+// @block Initialize one unit
 pub(crate) fn init_device(
     dev: &mut GenDevice,
     v: C64,
