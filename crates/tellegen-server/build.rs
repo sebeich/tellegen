@@ -6,8 +6,10 @@ use std::path::PathBuf;
 
 fn main() {
     let manifest = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").expect("manifest directory"));
-    let root = manifest.join("../..");
-    let rms = manifest.join("../tellegen/src/rms");
+    // Canonical, so file paths show relative to the workspace root.
+    let canonical = |p: PathBuf| p.canonicalize().unwrap_or(p);
+    let root = canonical(manifest.join("../.."));
+    let rms = canonical(manifest.join("../tellegen/src/rms"));
     // A directory: cargo reruns when any file under it changes.
     println!("cargo:rerun-if-changed={}", rms.display());
     let out = PathBuf::from(std::env::var("OUT_DIR").expect("OUT_DIR")).join("rms-blocks.html");
