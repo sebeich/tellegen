@@ -16,6 +16,7 @@
 - [RMS dynamic simulation](rms.md)
   - [Dynamics in the app](dynamics.md)
   - [RMS validation](rms-validation.md)
+  - [Block diagrams from the code](block-docs.md)
 - [Transports](transports.md)
 - [Getting Started](getting-started.md)
 - [Local Case Files](local-case-files.md)

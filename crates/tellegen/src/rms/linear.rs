@@ -8,6 +8,8 @@
 //! factors `p_ki = |v_ki| |w_ik|` normalized per mode, `W = V⁻¹`. A frequency
 //! response solves the descriptor system directly,
 //! `H(jω) = C (jω M − J)⁻¹ E`, so algebraic states need no elimination.
+//!
+//! @block Small-signal analysis
 
 use faer::linalg::solvers::Solve;
 use faer::{c64, Mat};
@@ -147,6 +149,8 @@ fn dense_jacobian(sys: &DynSystem, x: &[f64]) -> Mat<f64> {
 }
 
 /// The reduced state matrix over the differential states and their indices.
+///
+/// @block Reduced state matrix
 pub(crate) fn reduced_a(sys: &DynSystem, x: &[f64]) -> (Mat<f64>, Vec<usize>) {
     let j = dense_jacobian(sys, x);
     let diff: Vec<usize> = (0..sys.nx).filter(|&i| sys.mass[i] != 0.0).collect();
@@ -184,6 +188,8 @@ pub(crate) fn reduced_a(sys: &DynSystem, x: &[f64]) -> (Mat<f64>, Vec<usize>) {
 }
 
 /// Modes with participation factors.
+///
+/// @block Modes and participation
 pub(crate) fn modes(
     sys: &DynSystem,
     x: &[f64],
@@ -306,6 +312,8 @@ fn signal_name(spec: &BodeSpec) -> String {
 }
 
 /// Frequency responses of the descriptor system.
+///
+/// @block Frequency responses
 pub(crate) fn bode(
     sys: &DynSystem,
     x: &[f64],

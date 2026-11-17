@@ -3,6 +3,8 @@
 //! unit a machine, exciter, governor, stabilizer or an inverter model, swap
 //! one for another, or take it out. Records are written as PSS/E DYR text,
 //! so a case built in the browser saves, reloads and opens in other tools.
+//!
+//! @block Model library
 
 use crate::case_edit::UnitKey;
 use serde::{Deserialize, Serialize};
@@ -11,6 +13,8 @@ use powerio::{BalancedNetwork, DynamicCase, DynamicRecord};
 
 /// One model of the library: role, PSS/E name, what it is, typical
 /// parameters (PSS/E order, on the machine base), and how the engines run it.
+///
+/// @block Library model
 #[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct LibraryModel {
     /// `machine`, `exciter`, `governor`, `stabilizer` or `inverter`.
@@ -293,6 +297,8 @@ fn append(text: &mut String, record: &str) {
 /// # Errors
 /// An unknown model, a model of another role, or DYR text that does not
 /// parse.
+///
+/// @block Give a unit a model
 pub fn dyr_set_model(
     text: &str,
     bus: usize,
@@ -404,6 +410,8 @@ pub struct DynamizeRequest {
 ///
 /// # Errors
 /// As [`dyr_set_model`].
+///
+/// @block Make a static case dynamic
 pub fn dyr_dynamize(
     network: &BalancedNetwork,
     text: &str,
