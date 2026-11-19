@@ -17,6 +17,7 @@
 	import DynamicsTimeline from './components/dynamics/DynamicsTimeline.svelte';
 	import DynamicsUnitPopup from './components/dynamics/DynamicsUnitPopup.svelte';
 	import DynamicsWorkbench from './components/dynamics/DynamicsWorkbench.svelte';
+	import ProtectionTicker from './components/dynamics/ProtectionTicker.svelte';
 	import { getPanelLayout } from './panels.svelte.js';
 
 	const app = getAppState();
@@ -206,6 +207,8 @@
 		<DynamicsTimeline bind:dockHeight={timelineHeight} flush={sheetOpen} />
 	{/if}
 	{#if app.mode === 'dynamics' && app.dynamicsEnabled}<DynamicsUnitPopup />{/if}
+	{#if app.mode === 'dynamics' && app.dynamicsEnabled && dyn.protection.available}<ProtectionTicker
+		/>{/if}
 	<LogPanel />
 	<SettingsPanel />
 	{#if !app.studyView}

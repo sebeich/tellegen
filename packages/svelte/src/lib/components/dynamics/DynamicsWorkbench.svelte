@@ -245,11 +245,14 @@
 		});
 	});
 	const on = $derived(live.active && live.running);
+	/** With the case's relays acting, they clear the faults (busbar
+	 * differential, line distance and differential), nothing else does. */
+	const byRelays = $derived(!!live.localId && !!dyn.protection.schemeFor(live.localId));
 	const busFault = () =>
 		faultBus !== null &&
 		live.applyNow(
 			{ kind: 'bus_fault', time: 0, bus: faultBus, r: 0, x: faultX },
-			[{ kind: 'clear_fault', time: 0, bus: faultBus }],
+			byRelays ? [] : [{ kind: 'clear_fault', time: 0, bus: faultBus }],
 			faultMs / 1000
 		);
 	const br = () => ins?.branches[branch];
@@ -261,10 +264,12 @@
 		const [from, to, circuit] = br()!;
 		live.applyNow(
 			{ kind: 'line_fault', time: 0, from, to, circuit, location: lineAt / 100, r: 0, x: 1e-4, permanent: true },
-			[
-				{ kind: 'breaker_open', time: 0, from, to, circuit, at: from },
-				{ kind: 'breaker_open', time: 0, from, to, circuit, at: to }
-			],
+			byRelays
+				? []
+				: [
+						{ kind: 'breaker_open', time: 0, from, to, circuit, at: from },
+						{ kind: 'breaker_open', time: 0, from, to, circuit, at: to }
+					],
 			lineMs / 1000
 		);
 	}
@@ -294,7 +299,8 @@
 			moduleJson: l.studyInputJson,
 			dynText: dyn.dynText(a),
 			inspection: a.inspection,
-			loadModel: dyn.options.load_model ?? 'power_flow'
+			loadModel: dyn.options.load_model ?? 'power_flow',
+			protection: dyn.protection.schemeFor(l.id)
 		});
 	}
 </script>
@@ -493,7 +499,11 @@
 						<select bind:value={faultBus} aria-label="fault bus"
 							>{#each ins.buses as b (b)}<option value={b}>bus {b}</option>{/each}</select
 						>
-						<label><input type="number" min="10" step="10" bind:value={faultMs} /> ms</label>
+						{#if byRelays}
+							<span class="dim">cleared by the relays</span>
+						{:else}
+							<label><input type="number" min="10" step="10" bind:value={faultMs} /> ms</label>
+						{/if}
 						<label>X <input type="number" min="0" step="0.0001" bind:value={faultX} /></label>
 						<button class="act" disabled={!on} onclick={busFault}>⚡ Fault</button>
 					</div>
@@ -513,7 +523,11 @@
 					</div>
 					<div class="row">
 						<label>fault at <input type="number" min="1" max="99" step="5" bind:value={lineAt} /> %</label>
-						<label>open after <input type="number" min="10" step="10" bind:value={lineMs} /> ms</label>
+						{#if byRelays}
+							<span class="dim">cleared by the relays</span>
+						{:else}
+							<label>open after <input type="number" min="10" step="10" bind:value={lineMs} /> ms</label>
+						{/if}
 						<button class="act" disabled={!on} onclick={lineFault}>⚡ Fault on line</button>
 					</div>
 					<h5>Load step</h5>

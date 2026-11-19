@@ -1,5 +1,5 @@
 // Generated from Rust by rms_schema and generate-rms-types.mjs.
-// Source SHA256: 5c518b7a008390f71eca3fd80dcc6ee2739ded3b7616bd6e64574ba7064a40d5
+// Source SHA256: e951e68405e2326f4ee6e6c0be90c64768ea053381d0179ed08a1c9ff8b0ba5d
 
 /** Rotor angle figures, degrees. */
 export type AngleScreen = { "first_swing_deg": number; "first_swing_unit"?: string | null; "initial_separation_deg"?: number; "max_coi_angle_deg": number; "max_coi_angle_t": number; "max_coi_angle_unit"?: string | null; "max_separation_deg": number; "pair": Array<string>; "pole_slips": Array<PoleSlip>; "separation_t": number; "settled": boolean; "trend"?: (SwingTrend) | (null); };

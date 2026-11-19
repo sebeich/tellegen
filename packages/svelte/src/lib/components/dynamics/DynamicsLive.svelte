@@ -19,7 +19,8 @@
 			moduleJson: l.studyInputJson,
 			dynText: dyn.dynText(a),
 			inspection: a.inspection,
-			loadModel: dyn.options.load_model ?? 'power_flow'
+			loadModel: dyn.options.load_model ?? 'power_flow',
+			protection: dyn.protection.schemeFor(l.id)
 		});
 	}
 </script>

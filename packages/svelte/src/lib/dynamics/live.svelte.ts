@@ -10,6 +10,8 @@
 
 import {
 	BrowserRmsLive,
+	type ProtectionScheme,
+	type RelayOperation,
 	type RmsEvent,
 	type RmsGenerator,
 	type RmsInspection,
@@ -127,7 +129,25 @@ interface Input {
 	dynText: string;
 	inspection: RmsInspection;
 	loadModel: string;
+	/** Relays acting from the start (an engine build with `protection`). */
+	protection?: ProtectionScheme | null;
 }
+
+/** Relay operations the live view keeps, newest last. */
+const MAX_RELAY_OPS = 500;
+/** Relay operations that go to the event log (pickups and resets do not). */
+const LOGGED = new Set<RelayOperation['kind']>([
+	'trip',
+	'breaker_open',
+	'breaker_stuck',
+	'breaker_failure',
+	'reclose',
+	'lockout',
+	'blocked',
+	'bypassed',
+	'reinserted',
+	'sync_held'
+]);
 
 /** The live session of one case: the engine paced to the clock, the events
  * picked while it runs, and the kept window published as a run.
@@ -153,6 +173,8 @@ export class LiveView {
 	error = $state<string | null>(null);
 	/** What the engine did, newest last: `[t, text]`. */
 	log: [number, string][] = $state.raw([]);
+	/** What the relays did, newest last (with relays acting). */
+	relays: RelayOperation[] = $state.raw([]);
 	/** The kept window as a run (null before the first slice). */
 	run: RmsRun | null = $state.raw(null);
 	/** The local case the session belongs to. */
@@ -202,12 +224,20 @@ export class LiveView {
 					outputStep: OUTPUT_STEP
 				});
 				await s.setRecord({ channels: RECORD, frames: [], frame_step: 0 } as never);
+				if (input.protection) {
+					try {
+						await s.setProtection(input.protection);
+					} catch (e) {
+						this.error = `protection: ${(e as Error).message}`;
+					}
+				}
 				this.#session = s;
 				this.#inspection = input.inspection;
 				this.localId = localId;
 				this.generation += 1;
 				this.t = 0;
 				this.log = [];
+				this.relays = [];
 				this.#samples = new Samples();
 				this.#layout = null;
 				this.#pending = [];
@@ -243,6 +273,7 @@ export class LiveView {
 		this.achieved = null;
 		this.perf = null;
 		this.perfHistory = [];
+		this.relays = [];
 		this.#pending = [];
 		this.#queued = [];
 		this.#samples = new Samples();
@@ -257,6 +288,16 @@ export class LiveView {
 			this.dt = await this.#session.setStep(dt);
 		} catch (e) {
 			this.error = (e as Error).message;
+		}
+	}
+
+	/** Let the relays of `scheme` act from now on (null: none). */
+	async setProtection(scheme: ProtectionScheme | null): Promise<void> {
+		if (!this.#session?.alive) return;
+		try {
+			await this.#session.setProtection(scheme);
+		} catch (e) {
+			this.error = `protection: ${(e as Error).message}`;
 		}
 	}
 
@@ -347,6 +388,7 @@ export class LiveView {
 				perfAcc.round += round;
 				perfAcc.n += 1;
 				this.t = slice.t;
+				if (slice.relays.length) this.#relays(slice.relays);
 				// Unpaced, the clock target stays at the time reached.
 				if (unpaced) expected = this.t;
 				this.#append(slice.time, slice.keys, slice.series.bind(slice));
@@ -370,6 +412,21 @@ export class LiveView {
 			this.error = (e as Error).message;
 			this.running = false;
 		}
+	}
+
+	/** Keep the relays' operations and log what they switched. */
+	#relays(ops: RelayOperation[]): void {
+		this.relays = [...this.relays, ...ops].slice(-MAX_RELAY_OPS);
+		const logged = ops
+			.filter((o) => LOGGED.has(o.kind))
+			.map(
+				(o) =>
+					[
+						o.time,
+						`${o.relay} ${o.function} ${o.kind.replace(/_/g, ' ')}${o.detail ? ` (${o.detail})` : ''}`
+					] as [number, string]
+			);
+		if (logged.length) this.log = [...this.log, ...logged].slice(-40);
 	}
 
 	/** Add a slice: write its samples, derive the new samples' bus

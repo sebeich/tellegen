@@ -73,6 +73,8 @@ pub mod objective;
 #[cfg(feature = "sensitivity")]
 pub mod plan;
 mod problem;
+#[cfg(feature = "protection")]
+pub mod protection;
 pub mod ratings;
 pub mod regulation;
 #[cfg(feature = "rms")]
