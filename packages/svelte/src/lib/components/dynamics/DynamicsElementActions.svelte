@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getAppState, getController } from '../../context.svelte.js';
+	import ProtectionElement from './ProtectionElement.svelte';
 	import {
 		branchTrip,
 		busFault,
@@ -118,6 +119,7 @@
 						{/each}
 					</ul>
 				{/if}
+				<ProtectionElement target={{ kind: 'bus', bus }} what="this bus" />
 			{/if}
 		{:else if branch}
 			<h4>Line {branch.from}–{branch.to}</h4>
@@ -168,6 +170,10 @@
 						></label
 					>
 				</div>
+				<ProtectionElement
+					target={{ kind: 'branch', from: branch.from, to: branch.to, circuit: chosenCircuit ?? undefined }}
+					what={branch.transformer ? 'this transformer' : 'this line'}
+				/>
 			{/if}
 		{/if}
 		{#if message}<p class="msg" role="status">{message}</p>{/if}

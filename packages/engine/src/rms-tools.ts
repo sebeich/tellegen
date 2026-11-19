@@ -8,6 +8,7 @@ import { assertEngineInputLength } from "./input-limit.js";
 import type { RmsLiveSliceValue, RmsToolOp } from "./rms-protocol.js";
 import { ExperimentalUnavailable, rmsCall, rmsGeneration, rmsSupport } from "./rms.js";
 import type { LoadModel, RecordSpec, RmsEvent } from "./generated/rms-types.js";
+import type { ProtectionScheme, RelayOperation } from "./protection.js";
 
 async function call(op: RmsToolOp, what: string): Promise<unknown> {
   const support = await rmsSupport();
@@ -231,6 +232,8 @@ export interface RmsLiveSlice {
   values: Float64Array;
   /** Events applied since the previous slice, as the engine describes them. */
   events: string[];
+  /** Relay operations since the previous slice (with relays set). */
+  relays: RelayOperation[];
   /** Time the worker spent computing the slice, ms (wasm only, no transfer). */
   workerMs: number;
   series(key: string): Float64Array | undefined;
@@ -300,11 +303,18 @@ export class BrowserRmsLive {
     this.#check();
     const { value, workerMs } = await rmsCall({ op: "live_advance", session: this.#session, seconds });
     const v = value as RmsLiveSliceValue;
-    const meta = JSON.parse(v.meta) as { t: number; time: number[]; keys: string[]; events: string[] };
+    const meta = JSON.parse(v.meta) as {
+      t: number;
+      time: number[];
+      keys: string[];
+      events: string[];
+      relays?: RelayOperation[];
+    };
     const n = meta.time.length;
     const index = new Map(meta.keys.map((k, i) => [k, i] as const));
     return {
       ...meta,
+      relays: meta.relays ?? [],
       workerMs,
       values: v.values,
       series(key: string) {
@@ -320,6 +330,17 @@ export class BrowserRmsLive {
     this.#check();
     return (await rmsCall({ op: "live_apply", session: this.#session, event_json: JSON.stringify(event) }))
       .value as string;
+  }
+
+  /** Let the relays of `scheme` act from now on (null: none). Their
+   * operations come with the slices ({@link RmsLiveSlice.relays}). */
+  async setProtection(scheme: ProtectionScheme | null): Promise<void> {
+    this.#check();
+    await rmsCall({
+      op: "live_protection",
+      session: this.#session,
+      scheme_json: scheme ? JSON.stringify(scheme) : "",
+    });
   }
 
   free(): void {

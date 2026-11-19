@@ -11,6 +11,7 @@
 	import DynamicsBode from './DynamicsBode.svelte';
 	import DynamicsLive from './DynamicsLive.svelte';
 	import DynamicsModels from './DynamicsModels.svelte';
+	import DynamicsProtection from './DynamicsProtection.svelte';
 	import { headline } from '../../dynamics/verdict.js';
 	import { onTabKey } from '../../dynamics/tabs.js';
 	import ModeSwitch from './ModeSwitch.svelte';
@@ -23,14 +24,20 @@
 	const dyn = ctrl.dynamics;
 
 	let open = $state(false);
-	type Tab = 'run' | 'live' | 'models' | 'modes';
-	const TABS: [Tab, string][] = [
+	type Tab = 'run' | 'live' | 'models' | 'modes' | 'protection';
+	const TABS = $derived<[Tab, string][]>([
 		['run', 'Simulation'],
 		['live', 'Live'],
 		['models', 'Models'],
-		['modes', 'Modes']
-	];
+		['modes', 'Modes'],
+		...(dyn.protection.available ? ([['protection', 'Protection']] as [Tab, string][]) : [])
+	]);
 	let tab = $state<Tab>('run');
+	// A relay picked (on the map or in an element's card) shows on the Protection tab.
+	$effect(() => {
+		if (dyn.protection.selectedRelay && dyn.protection.available)
+			untrack(() => (tab = 'protection'));
+	});
 	let demoBusy = $state(false);
 	let demoError = $state<string | null>(null);
 	const att = $derived(dyn.active);
@@ -367,6 +374,8 @@
 					<DynamicsLive />
 				{:else if tab === 'models' && experimental}
 					<DynamicsModels />
+				{:else if tab === 'protection' && dyn.protection.available}
+					<DynamicsProtection />
 				{:else if tab === 'modes' && experimental}
 					<section class="block" aria-label="Small-signal modes" data-testid="dyn-modes">
 						{#if dyn.modes}
@@ -407,7 +416,11 @@
 								{@const h = headline(r.run?.screening ?? null, r.failure, r.tEnd)}
 								<button aria-pressed={r.id === dyn.currentRunId} onclick={() => dyn.select(r.id)}>
 									<span aria-hidden="true">{h.icon}</span>
-									{r.events.length ? dyn.describe(r.events[0]) : 'No events'}{r.events.length > 1
+									{r.replay
+										? r.replay.label
+										: r.events.length
+											? dyn.describe(r.events[0])
+											: 'No events'}{r.events.length > 1
 										? ` and ${r.events.length - 1} more`
 										: ''}
 									{#if r.agent}<span class="agent">Agent</span>{/if}

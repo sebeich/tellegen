@@ -72,6 +72,7 @@ export {
   type VoltageScreen,
 } from "./rms.js";
 export * from "./rms-tools.js";
+export * from "./protection.js";
 export type { RmsBodeCurve, RmsBodeSpec } from "./rms.js";
 export type {
   RmsRunValue,
