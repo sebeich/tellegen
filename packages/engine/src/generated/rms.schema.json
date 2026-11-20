@@ -1358,5 +1358,5 @@
   ],
   "title": "RmsSchema",
   "type": "object",
-  "x-rust-source-sha256": "e951e68405e2326f4ee6e6c0be90c64768ea053381d0179ed08a1c9ff8b0ba5d"
+  "x-rust-source-sha256": "6ca296fa1bca23f64e1c80c4ec527cf54fd0d834c05dabf5c5361d9e1ea37b9d"
 }

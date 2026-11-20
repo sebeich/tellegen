@@ -2334,6 +2334,7 @@ dependencies = [
  "powerio-matrix",
  "powerio-prob",
  "powerio-tx",
+ "rayon",
  "schemars",
  "serde",
  "serde_json",
